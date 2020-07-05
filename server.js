@@ -2,6 +2,8 @@ const express = require("express");
 const mongojs = require("mongojs");
 const logger = require("morgan");
 const path = require("path");
+const Model = require("./models/model.js");
+
 
 const app = express();
 
@@ -28,18 +30,25 @@ app.get("/", (req, res) => {
 
 //HTML route to exercise page
 app.get("/exercise", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/exercise.html"));
+  res.sendFile(path.join(__dirname, "./public/exercise.html"));
 });
 
 //HTML route to stats page
 app.get("/stats", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/stats.html"));
+  res.sendFile(path.join(__dirname, "./public/stats.html"));
 });
 
-//API route to send array of all workouts
+//API route to sends array of all workouts
 app.get("/api/workouts", (req, res) => {
   //TODO
-  res.json(req.user);
+  Model.Workout.find({}) //split models into multiple files?
+  .sort({ date: -1 })
+  .then(dbFitness => {
+    res.json(dbFitness);
+  })
+  .catch(err => {
+    res.status(400).json(err);
+  });
 });
 
 //API route to add new workout and send it (new workouts have no exercises and the "day" field is set to the current time)

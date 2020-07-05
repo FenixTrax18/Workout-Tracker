@@ -1,7 +1,4 @@
 const mongoose = require("mongoose");
-const extend = require("mongoose-schema-extend");
-
-
 const Schema = mongoose.Schema;
 
 const ExerciseSchema = new Schema({
@@ -30,43 +27,94 @@ const ExerciseSchema = new Schema({
     min: [0, 'Must be greater than 0']
   },
 
-},
-{
-  disciminatorKey: 'type'
-});
-
-const resistenceSchema = ExerciseSchema.extend({
+  //specific to resistence type
   weight:{
     type: Number,
-    required: "Exercise weight is required",
-    min: [0, 'Must be greater than 0']
+    validate: {
+      validator: function(v) {
+
+        if (this.type === "resistence" && v > 0){
+          return true;
+        }
+
+        else if (this.type === "cardio" && v == null){
+          return true;
+        }
+
+        else {
+          return false;
+        }
+      },
+      message: type => `Exercise weight must be greater than 0`
+    }
   },
+
   reps: {
     type: Number,
-    required: "Exercise reps is required",
-    min: [0, 'Must be greater than 0']
+    validate: {
+      validator: function(v) {
+
+        if (this.type === "resistence" && v > 0){
+          return true;
+        }
+
+        else if (this.type === "cardio" && v == null){
+          return true;
+        }
+
+        else {
+          return false;
+        }
+      },
+      message: type => `Exercise reps must be greater than 0`
+    }
   },
+  
   sets: {
     type: Number,
-    required: "Exercise sets is required",
-    min: [0, 'Must be greater than 0']
+    validate: {
+      validator: function(v) {
+
+        if (this.type === "resistence" && v > 0){
+          return true;
+        }
+
+        else if (this.type === "cardio" && v == null){
+          return true;
+        }
+
+        else {
+          return false;
+        }
+      },
+      message: type => `Exercise sets must be greater than 0`
+    }
+  },
+
+  //specific to cardio type
+  distance: {
+    type: Number,
+    validate: {
+      validator: function(v) {
+
+        if (this.type === "cardio" && v > 0){
+          return true;
+        }
+
+        else if (this.type === "resistence" && v == null){
+          return true;
+        }
+
+        else {
+          return false;
+        }
+      },
+      message: type => `Exercise distance must be greater than 0`
+    }
   }
 });
 
-const cardioSchema = ExerciseSchema.extend({
-  distance: {
-    type: Number,
-    required: "Exercise distance is required",
-    min: [0, 'Must be greater than 0']
-  }
-})
-
 const Exercise = mongoose.model("Exercise", ExerciseSchema);
-
-const Resistence = mongoose.model("Resistence", resistenceSchema);
-
-const Cardio = mongoose.model("Cardio", cardioSchema);
-
 
 const WorkoutSchema = new Schema({
   day: {
@@ -79,7 +127,7 @@ const WorkoutSchema = new Schema({
   }
 });
 
-workoutSchema.virtual('totalDuration').get(function () {
+WorkoutSchema.virtual('totalDuration').get(function () {
   //sum of totalDuration
   let tdSum = 0;
   for (let i = 0; i < this.exercises.length; i++) {
@@ -88,11 +136,9 @@ workoutSchema.virtual('totalDuration').get(function () {
   return tdSum;
 });
 
-const Workout = mongoose.model("Workout", workoutSchema);
+const Workout = mongoose.model("Workout", WorkoutSchema);
 
 module.exports = Exercise;
-module.exports = Resistence;
-module.exports = Cardio;
 module.exports = Workout;
 
 
