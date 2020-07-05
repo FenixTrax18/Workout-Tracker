@@ -67,4 +67,32 @@ const Resistence = mongoose.model("Resistence", resistenceSchema);
 
 const Cardio = mongoose.model("Cardio", cardioSchema);
 
+
+const WorkoutSchema = new Schema({
+  day: {
+    type: Date,
+    default: Date.now
+  },
+
+  exercises: {
+    type: [ExerciseSchema]
+  }
+});
+
+workoutSchema.virtual('totalDuration').get(function () {
+  //sum of totalDuration
+  let tdSum = 0;
+  for (let i = 0; i < this.exercises.length; i++) {
+    tdSum = tdSum + this.exercises[i].duration;
+  }
+  return tdSum;
+});
+
+const Workout = mongoose.model("Workout", workoutSchema);
+
 module.exports = Exercise;
+module.exports = Resistence;
+module.exports = Cardio;
+module.exports = Workout;
+
+
