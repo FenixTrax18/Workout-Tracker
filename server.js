@@ -1,5 +1,6 @@
 const express = require("express");
 const mongojs = require("mongojs");
+const mongoose = require("mongoose");
 const logger = require("morgan");
 const path = require("path");
 const Model = require("./models/workoutModel.js");
@@ -14,6 +15,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/dbExample", { useNewUrlParser: true });
 
 const databaseUrl = "fitnessTracker";
 const collections = ["workouts"];
@@ -71,13 +74,21 @@ app.get("/api/workouts", (req, res) => {
 //API route to add new workout and send it (new workouts have no exercises and the "day" field is set to the current time)
 app.post("/api/workouts", (req, res) => {
   console.log("Find Me: " + req.body);
-  db.workouts.insert(req.body, (error, data) => {
-    if (error) {
-      res.send(error);
-    } else {
-      res.send(data);
-    }
-  });
+    Model.create(req.body)
+    .then(data => {
+      console.log(data);
+      db.workouts.insert(data, (error, data) => {
+        if (error) {
+          res.send(error);
+        } else {
+          res.send(data);
+        }
+      });
+    })
+    .catch(err => {
+      res.json(err);
+    });
+  
 });
 
 //API route to append request body to exercise array then send updated workout
