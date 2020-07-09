@@ -2,7 +2,8 @@ const express = require("express");
 const mongojs = require("mongojs");
 const logger = require("morgan");
 const path = require("path");
-const Model = require("./models/model.js");
+const Model = require("./models/workoutModel.js");
+const { CLIENT_RENEG_LIMIT } = require("tls");
 
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const databaseUrl = "fitnessTracker";
-const collections = ["exercises"];
+const collections = ["workouts"];
 
 const db = mongojs(databaseUrl, collections);
 
@@ -41,22 +42,36 @@ app.get("/stats", (req, res) => {
 //API route to sends array of all workouts
 app.get("/api/workouts", (req, res) => {
   //TODO
-  Model.Workout.find({}) //split models into multiple files?
-  .sort({ date: -1 })
-  .then(dbFitness => {
-    res.json(dbFitness);
-  })
-  .catch(err => {
-    res.status(400).json(err);
-  });
+  console.log("Hello");
+  db.workouts.find({}, (error, data) => {
+    
+    if (error) {
+      res.send(error);
+    } else {
+      res.json(data);
+    }
+    });
+  // .sort({ date: -1 })
+  // .then(dbFitness => {
+  //   res.json(dbFitness);
+  //   console.log("World");
+  // })
+  // .catch(err => {
+  //   res.status(400).json(err);
+  // });
+  // db.notes.find({}, (error, data) => {
+  //   if (error) {
+  //     res.send(error);
+  //   } else {
+  //     res.json(data);
+  //   }
+  // });
 });
 
 //API route to add new workout and send it (new workouts have no exercises and the "day" field is set to the current time)
 app.post("/api/workouts", (req, res) => {
-  //TODO
-  console.log(req.body);
-
-  db.notes.insert(req.body, (error, data) => {
+  console.log("Find Me: " + req.body);
+  db.workouts.insert(req.body, (error, data) => {
     if (error) {
       res.send(error);
     } else {
@@ -68,11 +83,40 @@ app.post("/api/workouts", (req, res) => {
 //API route to append request body to exercise array then send updated workout
 app.put("/api/workouts/:id", (req, res) => {
   //TODO
+    var params = req.params;
+
+  db.workouts.update(
+    {
+      _id: mongojs.ObjectId(params.id)
+    },
+    {
+      $push: { exercises: req.body }
+    },
+
+    (error, edited) => {
+      if (error) {
+        console.log(error);
+        res.send(error);
+      } else {
+        console.log(edited);
+        res.send(edited);
+      }
+    }
+  );
 });
 
 //API route for sending array of 7 most recent workouts
 app.get("/apit/workouts/range", (req, res) => {
   //TODO
+  Model.Workout.find({}) //split models into multiple files?
+  .limit(7)
+  .sort({ date: -1 })
+  .then(dbFitness => {
+    res.json(dbFitness);
+  })
+  .catch(err => {
+    res.status(400).json(err);
+  });
 });
 
 //----------------------------------
