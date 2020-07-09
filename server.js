@@ -44,8 +44,6 @@ app.get("/stats", (req, res) => {
 
 //API route to sends array of all workouts
 app.get("/api/workouts", (req, res) => {
-  //TODO
-  console.log("Hello");
   db.workouts.find({}, (error, data) => {
     
     if (error) {
@@ -54,21 +52,6 @@ app.get("/api/workouts", (req, res) => {
       res.json(data);
     }
     });
-  // .sort({ date: -1 })
-  // .then(dbFitness => {
-  //   res.json(dbFitness);
-  //   console.log("World");
-  // })
-  // .catch(err => {
-  //   res.status(400).json(err);
-  // });
-  // db.notes.find({}, (error, data) => {
-  //   if (error) {
-  //     res.send(error);
-  //   } else {
-  //     res.json(data);
-  //   }
-  // });
 });
 
 //API route to add new workout and send it (new workouts have no exercises and the "day" field is set to the current time)
@@ -88,14 +71,11 @@ app.post("/api/workouts", (req, res) => {
     .catch(err => {
       res.json(err);
     });
-  
 });
 
 //API route to append request body to exercise array then send updated workout
 app.put("/api/workouts/:id", (req, res) => {
-  //TODO
-    var params = req.params;
-
+  var params = req.params;
   db.workouts.update(
     {
       _id: mongojs.ObjectId(params.id)
@@ -103,7 +83,6 @@ app.put("/api/workouts/:id", (req, res) => {
     {
       $push: { exercises: req.body }
     },
-
     (error, edited) => {
       if (error) {
         console.log(error);
@@ -117,9 +96,9 @@ app.put("/api/workouts/:id", (req, res) => {
 });
 
 //API route for sending array of 7 most recent workouts
-app.get("/apit/workouts/range", (req, res) => {
-  //TODO
-  Model.Workout.find({}) //split models into multiple files?
+app.get("/api/workouts/range", (req, res) => {
+  //TODO - fix TypeError: db.workouts.find(...).limit(...).sort(...).then is not a function
+  db.workouts.find({})
   .limit(7)
   .sort({ date: -1 })
   .then(dbFitness => {
@@ -129,80 +108,6 @@ app.get("/apit/workouts/range", (req, res) => {
     res.status(400).json(err);
   });
 });
-
-//----------------------------------
-
-// app.get("/all", (req, res) => {
-//   db.notes.find({}, (error, data) => {
-//     if (error) {
-//       res.send(error);
-//     } else {
-//       res.json(data);
-//     }
-//   });
-// });
-
-// app.get("/find/:id", (req, res) => {
-//   db.notes.findOne(
-//     {
-//       _id: mongojs.ObjectId(req.params.id)
-//     },
-//     (error, data) => {
-//       if (error) {
-//         res.send(error);
-//       } else {
-//         res.send(data);
-//       }
-//     }
-//   );
-// });
-
-// app.post("/update/:id", (req, res) => {
-//   db.notes.update(
-//     {
-//       _id: mongojs.ObjectId(req.params.id)
-//     },
-//     {
-//       $set: {
-//         title: req.body.title,
-//         note: req.body.note,
-//         modified: Date.now()
-//       }
-//     },
-//     (error, data) => {
-//       if (error) {
-//         res.send(error);
-//       } else {
-//         res.send(data);
-//       }
-//     }
-//   );
-// });
-
-// app.delete("/delete/:id", (req, res) => {
-//   db.notes.remove(
-//     {
-//       _id: mongojs.ObjectID(req.params.id)
-//     },
-//     (error, data) => {
-//       if (error) {
-//         res.send(error);
-//       } else {
-//         res.send(data);
-//       }
-//     }
-//   );
-// });
-
-// app.delete("/clearall", (req, res) => {
-//   db.notes.remove({}, (error, response) => {
-//     if (error) {
-//       res.send(error);
-//     } else {
-//       res.send(response);
-//     }
-//   });
-// });
 
 app.listen(3000, () => {
   console.log("App running on port 3000!");

@@ -15,10 +15,12 @@ const WorkoutSchema = new Schema({
 
 WorkoutSchema.virtual('totalDuration').get(function () {
   //sum of totalDuration
+  console.log(this.exercises);//TODO - fix
   let tdSum = 0;
   for (let i = 0; i < this.exercises.length; i++) {
     tdSum = tdSum + this.exercises[i].duration;
   }
+  console.log(tdSum);//TODO - fix
   return tdSum;
 });
 
