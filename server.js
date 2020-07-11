@@ -59,9 +59,11 @@ app.post("/api/workouts", (req, res) => {
 //API route to append request body to exercise array then send updated workout
 app.put("/api/workouts/:id", (req, res) => {
   var params = req.params;
-  db.Workout.findOneAndUpdate({ _id: params.id }, { $push: { exercises: req.body }})
+  var opts = { runValidators: true };
+  db.Workout.findOneAndUpdate({ _id: params.id }, { $push: { exercises: req.body }}, opts)
   .then(data => {
     res.json(data);
+    //if the exercise is invalid it is not inserted or updated, however the front-end does not act on invalid exercise data
   })
   .catch(err => {
     res.json(err);
@@ -70,7 +72,6 @@ app.put("/api/workouts/:id", (req, res) => {
 
 //API route for sending array of 7 most recent workouts
 app.get("/api/workouts/range", (req, res) => {
-  //TODO - fix TypeError: db.workouts.find(...).limit(...).sort(...).then is not a function
   db.Workout.find({})
   .limit(7)
   .sort({ date: -1 })
