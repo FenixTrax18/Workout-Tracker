@@ -37,8 +37,6 @@ app.get("/stats", (req, res) => {
 app.get("/api/workouts", (req, res) => {
   db.Workout.find({})
     .then(data => {
-      console.log("FIRST: " + data[0]);
-      console.log("TD: " + data[0].totalDuration);
       res.json(data);
     })
     .catch(err => {
@@ -51,7 +49,6 @@ app.get("/api/workouts", (req, res) => {
 app.post("/api/workouts", (req, res) => {
     db.Workout.create(req.body)
     .then(data => {
-      console.log("Created: " + JSON.stringify(data));
       res.json(data);
     })
     .catch(err => {
